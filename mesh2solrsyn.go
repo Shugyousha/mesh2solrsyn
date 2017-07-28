@@ -48,8 +48,6 @@ func gethyposyns(path string, mn *mesh.MeSHNode) []string {
 }
 
 func main() {
-	var mrslice []*mesh.MeSHRecord
-
 	mn := mesh.NewNode(make(map[string]*mesh.MeSHNode, 5))
 	meshrecs = make(mesh.MeSHRecordsMap, 30000)
 
@@ -59,14 +57,16 @@ func main() {
 	}
 
 	r := bufio.NewReader(os.Stdin)
-	mesh.ParseMeSHTree(r, *mn)
+	mpt := mesh.NewMeSHTreeParser(*r)
+	mpt.ParseMeSHTree(*mn)
 	f, err := os.Open(os.Args[1])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not open file: %s\n", err)
 	}
 
 	fr := bufio.NewReader(f)
-	_, meshrecs = mesh.ParseToSliceAndMap(*fr, meshrecs, mrslice)
+	mp := mesh.NewMeSHParser(*fr)
+	_, meshrecs = mp.ParseToSliceAndMap()
 
 	//suff := mn.GetSamePrefix("G11.561.600.810.964.186.624"})
 	for r, _ := range meshrecs {
